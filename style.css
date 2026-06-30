@@ -345,41 +345,76 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
     transform: scale(1.06);
 }
 
-/* --- PHYSICS BOUNDARIES AND CHIP STYLING --- */
+/* ==========================================================================
+   IDEA #5: HEAVY FLOATING IMAGE BUBBLES
+   ========================================================================== */
+
 .chip-boundary {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none; /* Allows text selection below it */
+    pointer-events: none;
     overflow: hidden;
 }
 
-.floating-chip {
+/* 🔵 The Floating Image Bubble Container */
+.floating-bubble {
     position: absolute;
-    width: 50px;
-    height: 50px;
+    width: 140px;             /* 📐 Perfect size for a 1:1 round picture node */
+    height: 140px;
+    border-radius: 50%;       /* 🔴 Enforces a perfect circular bubble shape */
+    border: 3px solid var(--accent);
     background: var(--card-bg);
-    border: 2px solid var(--accent);
-    color: var(--text);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
+    overflow: hidden;         /* Clips the image into the circle */
     cursor: grab;
     user-select: none;
-    pointer-events: auto; /* Re-enables interaction explicitly for dragging */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    z-index: 10;
-    transition: border-color 0.35s, box-shadow 0.2s, transform 0.1s ease-out;
+    pointer-events: auto;     /* Enables interaction explicitly for dragging */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 5;
+    /* Softly changes the border tint when passing page thresholds */
+    transition: border-color 0.35s, box-shadow 0.2s, transform 0.15s ease-out;
 }
 
-.floating-chip:active {
+/* Ensure the image inside scales cleanly into a circular crop */
+.floating-bubble img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;     /* Stops the image from blocking the cursor drag action */
+    filter: grayscale(20%) contrast(105%);
+    transition: filter 0.3s ease;
+}
+
+.floating-bubble:active {
     cursor: grabbing;
-    transform: scale(1.15);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    transform: scale(1.08);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+}
+
+.floating-bubble:hover img {
+    filter: grayscale(0%) contrast(100%);
+}
+
+/* --- FEATURE #2: STRUCTURAL BUBBLE SIZE CORES --- */
+
+.floating-bubble.size-sm {
+    width: 100px;
+    height: 100px;
+    border-width: 2px;
+}
+
+.floating-bubble.size-md {
+    width: 150px;
+    height: 150px;
+    border-width: 3px;
+}
+
+.floating-bubble.size-lg {
+    width: 200px;
+    height: 200px;
+    border-width: 4px;
 }

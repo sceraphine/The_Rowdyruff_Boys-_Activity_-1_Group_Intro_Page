@@ -1,136 +1,181 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const chips = document.querySelectorAll('.floating-chip');
+    const bubbles = document.querySelectorAll('.floating-bubble');
+    const allBubblesArray = [];
 
-    chips.forEach(chip => {
-        const boundary = chip.closest('.chip-boundary');
+    // ✨ CONFIG MATRIX: Adjusted to matching prompt specifications!
+    const sizeProfiles = [
+        { class: 'size-lg', radius: 100, mass: 0.8 }, // Large (200px diameter) -> Light weight
+        { class: 'size-md', radius: 75,  mass: 1.5 }, // Medium (150px diameter) -> Balanced weight
+        { class: 'size-sm', radius: 50,  mass: 3.0 }  // Small (100px diameter) -> Heavy density
+    ];
+
+    // --- INITIALIZATION ---
+    bubbles.forEach((bubble, index) => {
+        const boundary = bubble.closest('.chip-boundary');
         
-        // Randomly place chip coordinates initially within its section bounds
-        let posX = Math.random() * (window.innerWidth - 100) + 20;
-        let posY = Math.random() * (window.innerHeight - 100) + 20;
+        // Distribute sizing categories uniformly across your 3 bubbles per section
+        const profile = sizeProfiles[index % sizeProfiles.length];
+        bubble.classList.add(profile.class);
         
-        // Get primary velocity speeds set via data-attributes
-        let velX = parseFloat(chip.dataset.speedX) || 2;
-        let velY = parseFloat(chip.dataset.speedY) || 2;
+        const radius = profile.radius;
+        const mass = profile.mass;
+
+        // Clean initial scatter spacing that accounts for the maximum 200px sizes safely
+        let posX = Math.random() * (window.innerWidth - radius * 2 - 60) + 30;
+        let posY = Math.random() * (window.innerHeight - radius * 2 - 60) + 30;
+        
+        let velX = parseFloat(bubble.dataset.speedX) || 1;
+        let velY = parseFloat(bubble.dataset.speedY) || 1;
         
         let isDragging = false;
         let dragOffsetX = 0;
         let dragOffsetY = 0;
 
-        // Apply random initial position
-        chip.style.left = `${posX}px`;
-        chip.style.top = `${posY}px`;
+        bubble.style.left = `${posX}px`;
+        bubble.style.top = `${posY}px`;
 
-        // --- MOUSE/TOUCH DRAG HANDLERS ---
-        chip.addEventListener('mousedown', (e) => {
+        const bubbleObject = {
+            el: bubble,
+            boundary: boundary,
+            radius: radius,
+            mass: mass,
+            get posX() { return posX; },
+            set posX(v) { posX = v; bubble.style.left = `${v}px`; },
+            get posY() { return posY; },
+            set posY(v) { posY = v; bubble.style.top = `${v}px`; },
+            get velX() { return velX; },
+            set velX(v) { velX = v; },
+            get velY() { return velY; },
+            set velY(v) { velY = v; },
+            get isDragging() { return isDragging; },
+            set isDragging(v) { isDragging = v; }
+        };
+
+        // --- DRAG INTERFACES ---
+        bubble.addEventListener('mousedown', (e) => {
             isDragging = true;
-            chip.style.cursor = 'grabbing';
-            // Capture offsets relative to chip box boundaries
-            dragOffsetX = e.clientX - chip.offsetLeft;
-            dragOffsetY = e.clientY - chip.offsetTop;
+            bubble.style.cursor = 'grabbing';
+            
+            const bounds = boundary.getBoundingClientRect();
+            const mousePageX = e.clientX;
+            const mousePageY = e.clientY + window.scrollY - bounds.top;
+            
+            dragOffsetX = mousePageX - posX;
+            dragOffsetY = mousePageY - posY;
+            
             e.stopPropagation();
+            e.preventDefault();
         });
 
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
             
             const bounds = boundary.getBoundingClientRect();
-            
-            // Map cursor movement relative to the page section container frame
             let targetX = e.clientX - dragOffsetX;
             let targetY = (e.clientY + window.scrollY) - bounds.top - dragOffsetY;
 
-            // Restrict dragging outside page edges
-            posX = Math.max(0, Math.min(targetX, bounds.width - chip.offsetWidth));
-            posY = Math.max(0, Math.min(targetY, bounds.height - chip.offsetHeight));
+            posX = Math.max(0, Math.min(targetX, bounds.width - radius * 2));
+            posY = Math.max(0, Math.min(targetY, bounds.height - radius * 2));
 
-            chip.style.left = `${posX}px`;
-            chip.style.top = `${posY}px`;
+            bubble.style.left = `${posX}px`;
+            bubble.style.top = `${posY}px`;
             
-            // Recalculate subtle momentum on release
-            velX = (e.movementX || 0) * 0.3;
-            velY = (e.movementY || 0) * 0.3;
+            velX = (e.movementX || 0) * 0.25;
+            velY = (e.movementY || 0) * 0.25;
         });
 
         window.addEventListener('mouseup', () => {
             if (isDragging) {
                 isDragging = false;
-                chip.style.cursor = 'grab';
-                // Enforce minimum residual velocity baseline so it doesn't stay dead completely
-                if (Math.abs(velX) < 0.5) velX = (Math.random() > 0.5 ? 1 : -1) * 1.5;
-                if (Math.abs(velY) < 0.5) velY = (Math.random() > 0.5 ? 1 : -1) * 1.5;
+                bubble.style.cursor = 'grab';
+                if (Math.abs(velX) < 0.3) velX = (Math.random() > 0.5 ? 1 : -1) * 1.2;
+                if (Math.abs(velY) < 0.3) velY = (Math.random() > 0.5 ? 1 : -1) * 1.2;
             }
         });
 
-        // --- REAL-TIME ENGINE LOOP ROUTINE ---
-        function updatePhysics() {
-            if (!isDragging) {
-                const bounds = boundary.getBoundingClientRect();
-                const chipWidth = chip.offsetWidth;
-                const chipHeight = chip.offsetHeight;
-
-                // 🌌 CANVAS RIPPLE INTERACTION CHECK
-                // Pull active ripple waves moving through the central script.js framework array
-                if (window.ripplesArray && window.ripplesArray.length > 0) {
-                    // Absolute document vertical position of the chip node center
-                    const globalChipX = posX + (chipWidth / 2);
-                    const globalChipY = bounds.top + window.scrollY + posY + (chipHeight / 2);
-
-                    window.ripplesArray.forEach(ripple => {
-                        const dx = globalChipX - ripple.x;
-                        const dy = globalChipY - ripple.y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-
-                        // If ripple edge hits the chip boundary node position
-                        if (Math.abs(distance - ripple.radius) < 30) {
-                            const angle = Math.atan2(dy, dx);
-                            const shockIntensity = ripple.isModeWave ? 12 : 6; // Mode switches hit harder!
-                            
-                            // Accelerate chip outward matching blast propagation wave angle
-                            velX += Math.cos(angle) * shockIntensity;
-                            velY += Math.sin(angle) * shockIntensity;
-                        }
-                    });
-                }
-
-                // Apply deceleration damping friction over time so it returns to steady state velocity
-                velX *= 0.98;
-                velY *= 0.98;
-
-                // Clamp extreme acceleration forces to prevent clipping out of bounds
-                const speedCap = 18;
-                velX = Math.max(-speedCap, Math.min(velX, speedCap));
-                velY = Math.max(-speedCap, Math.min(velY, speedCap));
-
-                // Apply velocities to coordinates
-                posX += velX;
-                posY += velY;
-
-                // 🛑 SECTION BOUNDARY REFLECTION MECHANICAL CHECKS (Bounces off Page Edges)
-                if (posX <= 0) {
-                    posX = 0;
-                    velX = Math.abs(velX) * 0.85; // Reverse and slightly damp momentum
-                } else if (posX >= bounds.width - chipWidth) {
-                    posX = bounds.width - chipWidth;
-                    velX = -Math.abs(velX) * 0.85;
-                }
-
-                if (posY <= 0) {
-                    posY = 0;
-                    velY = Math.abs(velY) * 0.85;
-                } else if (posY >= bounds.height - chipHeight) {
-                    posY = bounds.height - chipHeight;
-                    velY = -Math.abs(velY) * 0.85;
-                }
-
-                // Render styles onto element layout coordinate matrix positions
-                chip.style.left = `${posX}px`;
-                chip.style.top = `${posY}px`;
-            }
-
-            requestAnimationFrame(updatePhysics);
-        }
-
-        // Initialize engine ticks for this node asset element
-        requestAnimationFrame(updatePhysics);
+        allBubblesArray.push(bubbleObject);
     });
+
+    // --- CIRCLE-TO-CIRCLE COLLISION SOLVER ---
+    function resolveCollisions() {
+        for (let i = 0; i < allBubblesArray.length; i++) {
+            for (let j = i + 1; j < allBubblesArray.length; j++) {
+                const b1 = allBubblesArray[i];
+                const b2 = allBubblesArray[j];
+
+                if (b1.boundary !== b2.boundary) continue;
+
+                const c1x = b1.posX + b1.radius;
+                const c1y = b1.posY + b1.radius;
+                const c2x = b2.posX + b2.radius;
+                const c2y = b2.posY + b2.radius;
+
+                const dx = c2x - c1x;
+                const dy = c2y - c1y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const minDist = b1.radius + b2.radius;
+
+                if (distance < minDist) {
+                    const overlap = minDist - distance;
+                    const nx = dx / (distance || 1);
+                    const ny = dy / (distance || 1);
+
+                    const totalMass = b1.mass + b2.mass;
+                    
+                    if (!b1.isDragging) {
+                        b1.posX -= nx * overlap * (b2.mass / totalMass);
+                        b1.posY -= ny * overlap * (b2.mass / totalMass);
+                    }
+                    if (!b2.isDragging) {
+                        b2.posX += nx * overlap * (b1.mass / totalMass);
+                        b2.posY += ny * overlap * (b1.mass / totalMass);
+                    }
+
+                    const kx = b1.velX - b2.velX;
+                    const ky = b1.velY - b2.velY;
+                    const p = 2 * (nx * kx + ny * ky) / totalMass;
+
+                    if (!b1.isDragging) {
+                        b1.velX -= p * b2.mass * nx;
+                        b1.velY -= p * b2.mass * ny;
+                    }
+                    if (!b2.isDragging) {
+                        b2.velX += p * b1.mass * nx;
+                        b2.velY += p * b1.mass * ny;
+                    }
+                }
+            }
+        }
+    }
+
+    // --- GLOBAL TICK EXECUTION LOOP ---
+    function masterPhysicsLoop() {
+        allBubblesArray.forEach(b => {
+            if (!b.isDragging) {
+                const bounds = b.boundary.getBoundingClientRect();
+                const diameter = b.radius * 2;
+
+                b.velX *= 0.99;
+                b.velY *= 0.99;
+
+                const minSpeed = 0.4;
+                if (Math.abs(b.velX) < minSpeed) b.velX = b.velX > 0 ? minSpeed : -minSpeed;
+                if (Math.abs(b.velY) < minSpeed) b.velY = b.velY > 0 ? minSpeed : -minSpeed;
+
+                b.posX += b.velX;
+                b.posY += b.velY;
+
+                if (b.posX <= 0) { b.posX = 0; b.velX = Math.abs(b.velX); }
+                else if (b.posX >= bounds.width - diameter) { b.posX = bounds.width - diameter; b.velX = -Math.abs(b.velX); }
+
+                if (b.posY <= 0) { b.posY = 0; b.velY = Math.abs(b.velY); }
+                else if (b.posY >= bounds.height - diameter) { b.posY = bounds.height - diameter; b.velY = -Math.abs(b.velY); }
+            }
+        });
+
+        resolveCollisions();
+        requestAnimationFrame(masterPhysicsLoop);
+    }
+
+    requestAnimationFrame(masterPhysicsLoop);
 });

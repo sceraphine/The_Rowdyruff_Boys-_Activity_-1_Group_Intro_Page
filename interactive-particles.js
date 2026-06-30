@@ -261,4 +261,24 @@ function animate() {
     requestAnimationFrame(animate);
 }
 
+// ✨ FIX: Intercept card redirect buttons and force an explicit smooth scroll to targets!
+document.querySelectorAll('.card-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const targetId = btn.getAttribute('href');
+        
+        // Only override if it's an internal hash anchor link
+        if (targetId && targetId.startsWith('#')) {
+            e.preventDefault(); // Stop raw jumping quirks
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                targetSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+    });
+});
+
 animate();
