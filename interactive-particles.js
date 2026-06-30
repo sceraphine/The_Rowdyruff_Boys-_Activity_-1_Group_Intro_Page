@@ -3,6 +3,8 @@ const ctx = canvas.getContext('2d');
 
 const mouse = { x: null, y: null, radius: 120 };
 let ripplesArray = [];
+window.ripplesArray = ripplesArray;
+
 let particlesArray = [];
 const gap = 30; 
 const dotSize = 2; 
