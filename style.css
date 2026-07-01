@@ -350,33 +350,35 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
    ========================================================================== */
 
 .chip-boundary {
-    position: absolute;
+    position: absolute !important;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
     overflow: hidden;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
 }
 
 /* 🔵 The Floating Image Bubble Container */
 .floating-bubble {
     position: absolute;
-    width: 140px;             /* 📐 Perfect size for a 1:1 round picture node */
+    width: 140px;             
     height: 140px;
-    border-radius: 50%;       /* 🔴 Enforces a perfect circular bubble shape */
+    border-radius: 50%;       
     border: 3px solid var(--accent);
     background: var(--card-bg);
-    overflow: hidden;         /* Clips the image into the circle */
+    overflow: hidden;         
     cursor: grab;
     user-select: none;
-    pointer-events: auto;     /* Enables interaction explicitly for dragging */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    pointer-events: auto;     
+    /* ✂️ REMOVED: box-shadow stripped to prevent border clipping issues! */
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     z-index: 5;
-    /* Softly changes the border tint when passing page thresholds */
-    transition: border-color 0.35s, box-shadow 0.2s, transform 0.15s ease-out;
+    transition: border-color 0.35s, transform 0.15s ease-out;
 }
 
 /* Ensure the image inside scales cleanly into a circular crop */
@@ -392,7 +394,6 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
 .floating-bubble:active {
     cursor: grabbing;
     transform: scale(1.08);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
 }
 
 .floating-bubble:hover img {
@@ -417,4 +418,167 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
     width: 200px;
     height: 200px;
     border-width: 4px;
+}
+
+/* --- DATA DOSSIER FRAMEWORK LAYOUTS --- */
+
+.dossier-grid {
+    display: flex;
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: 2rem;
+    justify-content: inherit; /* Inherits alignment from parent text alignment */
+}
+
+/* Force specific left alignment on the right-hand layout text boxes */
+.left-text {
+    text-align: left !important;
+}
+
+.dossier-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 1.5rem;
+    border-radius: 14px;
+    flex: 1;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    text-align: left; /* Keeps text legible inside the card cards */
+    transition: border-color 0.35s ease;
+}
+
+.dossier-grid:hover .dossier-card {
+    border-color: rgba(255, 255, 255, 0.05); /* Softly dims surrounding frames */
+}
+
+.dossier-card:hover {
+    border-color: var(--accent) !important;
+}
+
+.dossier-card.full-width {
+    max-width: 915px; /* Fits elegantly under two side-by-side cards */
+}
+
+.dossier-card h3 {
+    font-size: 1.1rem;
+    letter-spacing: 0.05rem;
+    text-transform: uppercase;
+    color: var(--text);
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 0.4rem;
+    margin: 0;
+}
+
+.details-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0;
+    margin: 0;
+}
+
+.details-list li {
+    font-size: 0.95rem;
+    color: var(--text-sub);
+}
+
+.details-list li strong {
+    color: var(--accent);
+    font-weight: 400;
+}
+
+.dossier-para {
+    font-size: 0.9rem;
+    color: var(--text-sub);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.dossier-card.full-width .dossier-para {
+    font-style: italic;
+    border-left: 3px solid var(--accent);
+    padding-left: 1rem;
+    color: var(--text);
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .dossier-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   WIDESCREEN PROFILE RE-LAYOUT (DECOUPLED CONTAINMENT FIELDS)
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+    .profile-layout {
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+        padding: 2rem 6rem !important;
+        box-sizing: border-box;
+        overflow: hidden !important;
+        position: relative;
+    }
+
+    /* Remove any scrollable containers entirely */
+    .profile-content {
+        max-width: 1000px !important;
+        width: 100% !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+        padding: 0 !important;
+        z-index: 2; /* Content sits underneath the bubble plane safely */
+    }
+
+    /* 🏷️ Alignments: Brick & Butch -> Right Aligned */
+    [data-scroll-theme="brick"], [data-scroll-theme="butch"] {
+        align-items: flex-end !important;
+        text-align: right !important;
+    }
+    [data-scroll-theme="brick"] .dossier-grid, [data-scroll-theme="butch"] .dossier-grid {
+        justify-content: flex-end;
+    }
+
+    /* 🏷️ Alignments: Boomer -> Left Aligned */
+    [data-scroll-theme="boomer"] {
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+    [data-scroll-theme="boomer"] .dossier-grid {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 1023px) {
+    .dossier-grid {
+        flex-direction: column;
+    }
+    .dossier-card {
+        max-width: 100%;
+    }
+}
+
+.profile-content::-webkit-scrollbar {
+    width: 6px;
+}
+.profile-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.profile-content::-webkit-scrollbar-thumb {
+    background: var(--card-border);
+    border-radius: 10px;
+}
+.profile-content::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
 }

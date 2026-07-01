@@ -2,25 +2,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const bubbles = document.querySelectorAll('.floating-bubble');
     const allBubblesArray = [];
 
-    // ✨ CONFIG MATRIX: Adjusted to matching prompt specifications!
+    // CONFIG MATRIX: Radius & Mass configurations
     const sizeProfiles = [
-        { class: 'size-lg', radius: 100, mass: 0.8 }, // Large (200px diameter) -> Light weight
-        { class: 'size-md', radius: 75,  mass: 1.5 }, // Medium (150px diameter) -> Balanced weight
-        { class: 'size-sm', radius: 50,  mass: 3.0 }  // Small (100px diameter) -> Heavy density
+        { class: 'size-lg', radius: 100, mass: 0.8 }, // Large (Lightweight)
+        { class: 'size-md', radius: 75,  mass: 1.5 }, // Medium (Balanced)
+        { class: 'size-sm', radius: 50,  mass: 3.0 }  // Small (Heavy/Dense)
     ];
 
     // --- INITIALIZATION ---
     bubbles.forEach((bubble, index) => {
         const boundary = bubble.closest('.chip-boundary');
         
-        // Distribute sizing categories uniformly across your 3 bubbles per section
         const profile = sizeProfiles[index % sizeProfiles.length];
         bubble.classList.add(profile.class);
         
         const radius = profile.radius;
         const mass = profile.mass;
 
-        // Clean initial scatter spacing that accounts for the maximum 200px sizes safely
         let posX = Math.random() * (window.innerWidth - radius * 2 - 60) + 30;
         let posY = Math.random() * (window.innerHeight - radius * 2 - 60) + 30;
         
@@ -39,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             boundary: boundary,
             radius: radius,
             mass: mass,
+            hitRipples: new Set(), // Trackers for ripples
             get posX() { return posX; },
             set posX(v) { posX = v; bubble.style.left = `${v}px`; },
             get posY() { return posY; },
@@ -155,12 +154,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bounds = b.boundary.getBoundingClientRect();
                 const diameter = b.radius * 2;
 
-                b.velX *= 0.99;
-                b.velY *= 0.99;
+                // 🌊 POLISHED: LOW-FORCE ORGANIC RIPPLE IMPULSE SYSTEM
+                if (window.ripplesArray && window.ripplesArray.length > 0) {
+                    const globalBubbleX = b.posX + b.radius;
+                    const globalBubbleY = bounds.top + window.scrollY + b.posY + b.radius;
 
-                const minSpeed = 0.4;
-                if (Math.abs(b.velX) < minSpeed) b.velX = b.velX > 0 ? minSpeed : -minSpeed;
-                if (Math.abs(b.velY) < minSpeed) b.velY = b.velY > 0 ? minSpeed : -minSpeed;
+                    window.ripplesArray.forEach(ripple => {
+                        const dx = globalBubbleX - ripple.x;
+                        const dy = globalBubbleY - ripple.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        const rippleId = `${ripple.x}_${ripple.y}_${ripple.maxRadius}`;
+
+                        // Trigger when wavefront rolls through the bubble zone
+                        if (distance <= ripple.radius + b.radius) {
+                            if (!b.hitRipples.has(rippleId)) {
+                                b.hitRipples.add(rippleId); 
+
+                                const angle = Math.atan2(dy, dx);
+                                
+                                // ✨ FIX: Substantially reduced raw forces for a velvet-smooth response
+                                const rawForce = ripple.isModeWave ? 4.5 : 1.5; 
+                                const massImpulse = rawForce / b.mass;
+
+                                b.velX += Math.cos(angle) * massImpulse;
+                                b.velY += Math.sin(angle) * massImpulse;
+                            }
+                        }
+                    });
+                }
+
+                // Clean up expired ripple references
+                if (window.ripplesArray.length === 0 && b.hitRipples.size > 0) {
+                    b.hitRipples.clear();
+                }
+
+                // Drag friction
+                b.velX *= 0.98;
+                b.velY *= 0.98;
+
+                // ✨ FIX: Reduced the maximum speed limit so things never go chaotic
+                const speedCap = 8; 
+                b.velX = Math.max(-speedCap, Math.min(b.velX, speedCap));
+                b.velY = Math.max(-speedCap, Math.min(b.velY, speedCap));
 
                 b.posX += b.velX;
                 b.posY += b.velY;
