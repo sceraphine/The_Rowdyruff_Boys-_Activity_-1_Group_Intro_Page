@@ -89,8 +89,8 @@ class Particle {
         this.myMode = 'dark'; 
     }
 
-    draw() {
-        if (this.opacity > 0.01) {
+        draw() {
+            if (this.opacity > 0.01) {
             const rgb = themeColors[this.myMode][currentTheme];
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);

@@ -158,6 +158,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bounds = b.boundary.getBoundingClientRect();
                 const diameter = b.radius * 2;
 
+                // ✨ THE SLOW MOVING RANDOM DIRECTION STEERING TRIGGER
+                // Check if this bubble belongs specifically to the free-roaming gallery canvas section
+                const isGalleryNode = b.el.closest('.gallery-canvas');
+                if (isGalleryNode) {
+                    // Give it a tiny 0.8% chance every frame to subtly steer onto a new course
+                    if (Math.random() < 0.008) { 
+                        // Generate a totally random vector angle
+                        const randomAngle = Math.random() * Math.PI * 2;
+                        // Keep it extremely slow and elegant (velocity between 0.35 and 0.65)
+                        const slowSpeedSetting = 0.35 + Math.random() * 0.3;
+                        
+                        b.velX = Math.cos(randomAngle) * slowSpeedSetting;
+                        b.velY = Math.sin(randomAngle) * slowSpeedSetting;
+                    }
+                }
+
                 if (window.ripplesArray && window.ripplesArray.length > 0) {
                     const globalBubbleX = b.posX + b.radius;
                     const globalBubbleY = bounds.top + window.scrollY + b.posY + b.radius;
@@ -175,7 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                 const angle = Math.atan2(dy, dx);
                                 
-                                const rawForce = ripple.isModeWave ? 4.5 : 1.5; 
+                                // Gallery elements receive a softer bounce from ripples to maintain composure
+                                const rawForce = ripple.isModeWave ? (isGalleryNode ? 1.5 : 4.5) : (isGalleryNode ? 0.5 : 1.5); 
                                 const massImpulse = rawForce / b.mass;
 
                                 b.velX += Math.cos(angle) * massImpulse;
@@ -192,7 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 b.velX *= 0.98;
                 b.velY *= 0.98;
 
-                const speedCap = 8; 
+                // Restrict speed limits so gallery nodes never zoom around aggressively
+                const speedCap = isGalleryNode ? 0.8 : 8; 
                 b.velX = Math.max(-speedCap, Math.min(b.velX, speedCap));
                 b.velY = Math.max(-speedCap, Math.min(b.velY, speedCap));
 
