@@ -1,30 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&display=swap');
 
-/* --- CENTRAL COLOR REGISTRY (CSS VARIABLES) --- */
 :root {
-    /* Global Base Enforcements */
-    --bg-dark: #16161d;       /* Your Pure Black */
-    --bg-light: #faf9f6;      /* Your Soft Bone White */
+    --bg-dark: #16161d;       
+    --bg-light: #faf9f6;     
     --card-bg-dark: rgba(255, 255, 255, 0.02);
     --card-bg-light: rgba(22, 22, 29, 0.03);
     --text-dark: #faf9f6;
     --text-light: #16161d;
 
-    /* Theme Accents */
     --accent-default-dark: #64ffda;
     --accent-default-light: #008272;
     
     --accent-brick-dark: #ff4d4d;
-    --accent-brick-light: #bd2423;    /* Your Red */
+    --accent-brick-light: #bd2423; 
     
     --accent-boomer-dark: #5294ff;
-    --accent-boomer-light: #3a64a4;   /* Your Blue */
+    --accent-boomer-light: #3a64a4;  
     
     --accent-butch-dark: #39d353;
-    --accent-butch-light: #277c47;    /* Your Green */
+    --accent-butch-light: #277c47;  
 }
 
-/* Dynamic State Mapping for App Modes */
 body[data-mode="dark"] {
     --bg: var(--bg-dark);
     --card-bg: var(--card-bg-dark);
@@ -40,7 +36,6 @@ body[data-mode="light"] {
     --text-sub: rgba(22, 22, 29, 0.6);
 }
 
-/* Dynamic Mapping for Accents */
 body[data-theme="default"][data-mode="dark"] { --accent: var(--accent-default-dark); }
 body[data-theme="default"][data-mode="light"] { --accent: var(--accent-default-light); }
 
@@ -53,7 +48,6 @@ body[data-theme="boomer"][data-mode="light"] { --accent: var(--accent-boomer-lig
 body[data-theme="butch"][data-mode="dark"] { --accent: var(--accent-butch-dark); }
 body[data-theme="butch"][data-mode="light"] { --accent: var(--accent-butch-light); }
 
-/* --- CORE ARCHITECTURE --- */
 * {
     margin: 0;
     padding: 0;
@@ -66,36 +60,32 @@ body, html {
     background-color: var(--bg);
     font-family: 'Space Grotesk', sans-serif;
     color: var(--text);
-    /* ⚡ CHANGED from 0.6s to 0.35s for a snappy, high-speed swap! */
     transition: background-color 0.35s cubic-bezier(0.25, 1, 0.5, 1), 
                 color 0.35s cubic-bezier(0.25, 1, 0.5, 1),
                 border-color 0.35s cubic-bezier(0.25, 1, 0.5, 1);
     scroll-behavior: smooth; 
 }
 
-/* Float the particle sheet layout naturally down the entire scrollable height */
 #canvas {
-    position: absolute; /* ✨ Changed from fixed to absolute */
+    position: absolute;
     top: 0;
     left: 0;
     width: 100vw;
-    /* height: 100vh; ❌ Remove this line so it doesn't limit the canvas height */
     z-index: 1;
     pointer-events: none;
 }
 
-/* --- GLOBAL LIGHT/DARK TOGGLE PANEL --- */
 .theme-panel {
-    position: fixed;        /* ✨ Changed from absolute to fixed so it stays with you! */
+    position: fixed;       
     top: 2rem;
     right: 2rem;
-    z-index: 100;           /* Bumped up z-index to make sure it floats on top of all text */
+    z-index: 100;          
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 0.4rem;        /* Tightened padding since it's a single item circle now */
-    border-radius: 50%;     /* Perfect circle wrapper around your emoji */
+    padding: 0.4rem;        
+    border-radius: 50%;    
     display: flex;
     align-items: center;
     justify-content: center;
@@ -123,7 +113,6 @@ body, html {
     transform: scale(1.08);
 }
 
-/* --- CONTINUOUS SCROLL DISPLAY FRAMEWORK --- */
 .content-container {
     position: relative;
     z-index: 2;
@@ -134,9 +123,8 @@ body, html {
     isolation: isolate; 
 }
 
-/* Force each story sequence node to perfectly capture full-screen frames */
 .scroll-page {
-    position: relative; /* ✨ Added so absolute children stay inside their respective sections */
+    position: relative; 
     min-height: 100vh;
     width: 100%;
     padding: 6rem 2rem;
@@ -178,7 +166,6 @@ body, html {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    /* Keeps layout transitions synced perfectly with your supercharged 0.35s speed */
     transition: border-color 0.35s cubic-bezier(0.25, 1, 0.5, 1), 
                 background-color 0.35s cubic-bezier(0.25, 1, 0.5, 1), 
                 transform 0.4s ease,
@@ -208,7 +195,6 @@ body, html {
     line-height: 1.6;
 }
 
-/* --- BOY PROFILE LAYOUT EXTENSIONS --- */
 .profile-layout {
     align-items: flex-start;
 }
@@ -255,22 +241,20 @@ body, html {
     background: transparent;
     transition: background-color 0.3s, color 0.3s, border-color 0.4s;
     cursor: pointer;
-    margin-top: auto; /* Pushes button nicely to the bottom of the card */
+    margin-top: auto;
 }
 
 .card-btn:hover {
     background-color: var(--accent);
-    color: var(--bg); /* Inverts color cleanly based on current dark/light mode background */
+    color: var(--bg); 
 }
 
 .card-num, .page-tag, .card-btn {
-    /* ⚡ Accelerated to 0.35s */
     transition: color 0.35s cubic-bezier(0.25, 1, 0.5, 1), 
                 border-color 0.35s cubic-bezier(0.25, 1, 0.5, 1), 
                 background-color 0.3s ease;
 }
 
-/* Give cards a solid mode-matching shadow outline effect during transitions */
 h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
     transition: -webkit-text-stroke 0.35s cubic-bezier(0.25, 1, 0.5, 1),
                 border-color 0.35s cubic-bezier(0.25, 1, 0.5, 1),
@@ -279,35 +263,32 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
                 box-shadow 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* 🕶️ DARK MODE ENFORCEMENT: Subtle, elegant translucent dark shell */
 [data-mode="dark"] h1, 
 [data-mode="dark"] h2, 
 [data-mode="dark"] h3, 
 [data-mode="dark"] p,
 [data-mode="dark"] span,
 [data-mode="dark"] a {
-    -webkit-text-stroke: 0.5px rgba(22, 22, 29, 0.4); /* ✨ Razor thin & translucent */
+    -webkit-text-stroke: 0.5px rgba(22, 22, 29, 0.4);
 }
 
 [data-mode="dark"] .card {
-    box-shadow: 0 0 0 0.5px rgba(22, 22, 29, 0.3); /* ✨ Ultra fine line bounding box */
+    box-shadow: 0 0 0 0.5px rgba(22, 22, 29, 0.3);
 }
 
-/* ☀️ LIGHT MODE ENFORCEMENT: Subtle, elegant translucent bright shell */
 [data-mode="light"] h1, 
 [data-mode="light"] h2, 
 [data-mode="light"] h3, 
 [data-mode="light"] p,
 [data-mode="light"] span,
 [data-mode="light"] a {
-    -webkit-text-stroke: 0.5px rgba(250, 249, 246, 0.4); /* ✨ Razor thin & translucent */
+    -webkit-text-stroke: 0.5px rgba(250, 249, 246, 0.4); 
 }
 
 [data-mode="light"] .card {
-    box-shadow: 0 0 0 0.5px rgba(250, 249, 246, 0.3); /* ✨ Ultra fine line bounding box */
+    box-shadow: 0 0 0 0.5px rgba(250, 249, 246, 0.3); 
 }
 
-/* 1x1 Structural Layout Row */
 .profile-gallery-grid {
     display: flex;
     gap: 1.5rem;
@@ -315,10 +296,9 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
     width: 100%;
 }
 
-/* Forces 1:1 Aspect Ratio Box rules */
 .profile-img-frame {
     width: clamp(100px, 18vw, 160px);
-    aspect-ratio: 1 / 1; /* ✨ Enforces strict square grid matrix */
+    aspect-ratio: 1 / 1; 
     border-radius: 12px;
     border: 1px solid var(--card-border);
     background: var(--card-bg);
@@ -345,10 +325,6 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
     transform: scale(1.06);
 }
 
-/* ==========================================================================
-   IDEA #5: HEAVY FLOATING IMAGE BUBBLES
-   ========================================================================== */
-
 .chip-boundary {
     position: absolute !important;
     top: 0;
@@ -362,7 +338,6 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
     border-radius: 0 !important;
 }
 
-/* 🔵 The Floating Image Bubble Container */
 .floating-bubble {
     position: absolute;
     width: 140px;             
@@ -374,19 +349,17 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
     cursor: grab;
     user-select: none;
     pointer-events: auto;     
-    /* ✂️ REMOVED: box-shadow stripped to prevent border clipping issues! */
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     z-index: 5;
     transition: border-color 0.35s, transform 0.15s ease-out;
 }
 
-/* Ensure the image inside scales cleanly into a circular crop */
 .floating-bubble img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    pointer-events: none;     /* Stops the image from blocking the cursor drag action */
+    pointer-events: none;   
     filter: grayscale(20%) contrast(105%);
     transition: filter 0.3s ease;
 }
@@ -399,8 +372,6 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
 .floating-bubble:hover img {
     filter: grayscale(0%) contrast(100%);
 }
-
-/* --- FEATURE #2: STRUCTURAL BUBBLE SIZE CORES --- */
 
 .floating-bubble.size-sm {
     width: 100px;
@@ -420,17 +391,15 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
     border-width: 4px;
 }
 
-/* --- DATA DOSSIER FRAMEWORK LAYOUTS --- */
 
 .dossier-grid {
     display: flex;
     gap: 1.5rem;
     width: 100%;
     margin-top: 2rem;
-    justify-content: inherit; /* Inherits alignment from parent text alignment */
+    justify-content: inherit;
 }
 
-/* Force specific left alignment on the right-hand layout text boxes */
 .left-text {
     text-align: left !important;
 }
@@ -447,12 +416,12 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
-    text-align: left; /* Keeps text legible inside the card cards */
+    text-align: left;
     transition: border-color 0.35s ease;
 }
 
 .dossier-grid:hover .dossier-card {
-    border-color: rgba(255, 255, 255, 0.05); /* Softly dims surrounding frames */
+    border-color: rgba(255, 255, 255, 0.05);
 }
 
 .dossier-card:hover {
@@ -460,7 +429,7 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
 }
 
 .dossier-card.full-width {
-    max-width: 915px; /* Fits elegantly under two side-by-side cards */
+    max-width: 915px;
 }
 
 .dossier-card h3 {
@@ -506,16 +475,11 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
     color: var(--text);
 }
 
-/* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
     .dossier-grid {
         grid-template-columns: 1fr;
     }
 }
-
-/* ==========================================================================
-   WIDESCREEN PROFILE RE-LAYOUT (DECOUPLED CONTAINMENT FIELDS)
-   ========================================================================== */
 
 @media (min-width: 1024px) {
     .profile-layout {
@@ -531,17 +495,15 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
         position: relative;
     }
 
-    /* Remove any scrollable containers entirely */
     .profile-content {
         max-width: 1000px !important;
         width: 100% !important;
         max-height: none !important;
         overflow-y: visible !important;
         padding: 0 !important;
-        z-index: 2; /* Content sits underneath the bubble plane safely */
+        z-index: 2;
     }
 
-    /* 🏷️ Alignments: Brick & Butch -> Right Aligned */
     [data-scroll-theme="brick"], [data-scroll-theme="butch"] {
         align-items: flex-end !important;
         text-align: right !important;
@@ -550,7 +512,6 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
         justify-content: flex-end;
     }
 
-    /* 🏷️ Alignments: Boomer -> Left Aligned */
     [data-scroll-theme="boomer"] {
         align-items: flex-start !important;
         text-align: left !important;
@@ -581,4 +542,141 @@ h1, h2, h3, p, span, a, .card-num, .page-tag, .card-btn {
 }
 .profile-content::-webkit-scrollbar-thumb:hover {
     background: var(--accent);
+}
+
+main.content-container > section:first-of-type .hero {
+    text-align: center !important;
+    align-items: center !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+main.content-container > section:first-of-type .title {
+    white-space: nowrap !important;
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block !important;
+}
+
+main.content-container > section:first-of-type .subtitle {
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 600px !important;
+}
+
+.jump-gallery-btn {
+    display: inline-block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15rem;
+    color: var(--text-sub);
+    text-decoration: none;
+    border: 1px dashed var(--card-border);
+    padding: 0.7rem 1.6rem;
+    border-radius: 30px;
+    background: transparent;
+    transition: all 0.3s ease-in-out;
+}
+
+.jump-gallery-btn:hover {
+    color: var(--accent) !important;
+    border-style: solid !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 12px rgba(var(--accent), 0.15);
+    transform: translateY(2px);
+}
+
+.gallery-view {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    box-sizing: border-box !important;
+    padding: 0 2rem !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+.gallery-canvas {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: none;
+    overflow: hidden;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    z-index: 2;
+}
+
+.gallery-canvas .floating-bubble {
+    pointer-events: auto !important;
+}
+
+.hidden-archive {
+    display: none !important;
+}
+
+.gallery-center-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 720px;
+    width: 100%;
+    text-align: center;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.gallery-center-block .hero,
+.gallery-center-block .back-to-top-btn {
+    pointer-events: auto;
+}
+
+.gallery-center-block .hero {
+    margin-bottom: 2.5rem;
+}
+
+.back-to-top-btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15rem;
+    color: var(--text-sub);
+    text-decoration: none;
+    border: 1px solid var(--card-border);
+    padding: 0.75rem 1.75rem;
+    border-radius: 30px;
+    background: var(--card-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s ease-in-out;
+}
+
+.back-to-top-btn:hover {
+    color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 15px rgba(var(--accent), 0.2);
+    transform: translateY(-3px);
+}
+
+@media (max-width: 1023px) {
+    .gallery-view {
+        height: auto !important;
+        max-height: none !important;
+        padding: 8rem 2rem !important;
+    }
+    .gallery-canvas {
+        height: 100% !important;
+        min-height: 600px;
+    }
 }

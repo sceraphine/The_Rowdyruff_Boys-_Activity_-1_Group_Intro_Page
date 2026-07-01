@@ -2,19 +2,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const bubbles = document.querySelectorAll('.floating-bubble');
     const allBubblesArray = [];
 
-    // CONFIG MATRIX: Radius & Mass configurations
     const sizeProfiles = [
-        { class: 'size-lg', radius: 100, mass: 0.8 }, // Large (Lightweight)
-        { class: 'size-md', radius: 75,  mass: 1.5 }, // Medium (Balanced)
-        { class: 'size-sm', radius: 50,  mass: 3.0 }  // Small (Heavy/Dense)
+        { class: 'size-lg', radius: 100, mass: 0.8 },
+        { class: 'size-md', radius: 75,  mass: 1.5 },
+        { class: 'size-sm', radius: 50,  mass: 3.0 }
     ];
 
-    // --- INITIALIZATION ---
     bubbles.forEach((bubble, index) => {
         const boundary = bubble.closest('.chip-boundary');
         
-        const profile = sizeProfiles[index % sizeProfiles.length];
-        bubble.classList.add(profile.class);
+        let profile = null;
+        if (bubble.classList.contains('size-lg')) {
+            profile = sizeProfiles[0];
+        } else if (bubble.classList.contains('size-md')) {
+            profile = sizeProfiles[1];
+        } else if (bubble.classList.contains('size-sm')) {
+            profile = sizeProfiles[2];
+        } else {
+            profile = sizeProfiles[index % sizeProfiles.length];
+            bubble.classList.add(profile.class);
+        }
         
         const radius = profile.radius;
         const mass = profile.mass;
@@ -37,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             boundary: boundary,
             radius: radius,
             mass: mass,
-            hitRipples: new Set(), // Trackers for ripples
+            hitRipples: new Set(),
             get posX() { return posX; },
             set posX(v) { posX = v; bubble.style.left = `${v}px`; },
             get posY() { return posY; },
@@ -50,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
             set isDragging(v) { isDragging = v; }
         };
 
-        // --- DRAG INTERFACES ---
         bubble.addEventListener('mousedown', (e) => {
             isDragging = true;
             bubble.style.cursor = 'grabbing';
@@ -95,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         allBubblesArray.push(bubbleObject);
     });
 
-    // --- CIRCLE-TO-CIRCLE COLLISION SOLVER ---
     function resolveCollisions() {
         for (let i = 0; i < allBubblesArray.length; i++) {
             for (let j = i + 1; j < allBubblesArray.length; j++) {
@@ -147,14 +152,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- GLOBAL TICK EXECUTION LOOP ---
     function masterPhysicsLoop() {
         allBubblesArray.forEach(b => {
             if (!b.isDragging) {
                 const bounds = b.boundary.getBoundingClientRect();
                 const diameter = b.radius * 2;
 
-                // 🌊 POLISHED: LOW-FORCE ORGANIC RIPPLE IMPULSE SYSTEM
                 if (window.ripplesArray && window.ripplesArray.length > 0) {
                     const globalBubbleX = b.posX + b.radius;
                     const globalBubbleY = bounds.top + window.scrollY + b.posY + b.radius;
@@ -166,14 +169,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         const rippleId = `${ripple.x}_${ripple.y}_${ripple.maxRadius}`;
 
-                        // Trigger when wavefront rolls through the bubble zone
                         if (distance <= ripple.radius + b.radius) {
                             if (!b.hitRipples.has(rippleId)) {
                                 b.hitRipples.add(rippleId); 
 
                                 const angle = Math.atan2(dy, dx);
                                 
-                                // ✨ FIX: Substantially reduced raw forces for a velvet-smooth response
                                 const rawForce = ripple.isModeWave ? 4.5 : 1.5; 
                                 const massImpulse = rawForce / b.mass;
 
@@ -184,16 +185,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
 
-                // Clean up expired ripple references
                 if (window.ripplesArray.length === 0 && b.hitRipples.size > 0) {
                     b.hitRipples.clear();
                 }
 
-                // Drag friction
                 b.velX *= 0.98;
                 b.velY *= 0.98;
 
-                // ✨ FIX: Reduced the maximum speed limit so things never go chaotic
                 const speedCap = 8; 
                 b.velX = Math.max(-speedCap, Math.min(b.velX, speedCap));
                 b.velY = Math.max(-speedCap, Math.min(b.velY, speedCap));

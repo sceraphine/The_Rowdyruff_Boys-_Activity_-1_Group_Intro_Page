@@ -34,7 +34,6 @@ const modeColors = {
 
 function init() {
     canvas.width = window.innerWidth;
-    // ✨ CHANGE THIS LINE: Use document scroll height so the canvas fills the entire page height!
     canvas.height = document.documentElement.scrollHeight; 
     particlesArray = [];
 
@@ -53,25 +52,21 @@ function init() {
 window.addEventListener('resize', init);
 window.addEventListener('mousemove', (event) => { 
     mouse.x = event.clientX; 
-    mouse.y = event.pageY; // ✨ Changed from clientY to pageY
+    mouse.y = event.pageY;
 });
 window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
 
-// Keep track of the last window viewport position to calculate scroll delta changes
 let lastScrollY = window.scrollY;
 
 window.addEventListener('scroll', () => {
-    // If the mouse isn't on the screen, do nothing
     if (mouse.y !== null) {
         const deltaY = window.scrollY - lastScrollY;
-        mouse.y += deltaY; // ✨ Update the tracker by the exact number of pixels scrolled!
-    }
+        mouse.y += deltaY; 
     lastScrollY = window.scrollY;
+    }
 });
 
-// Standard ambient manual ripple trigger on empty backdrop space click
 window.addEventListener('click', (event) => {
-    // If we click the mode toggle button panel or text cards, ignore background ripple mechanics
     if (event.target.closest('.theme-panel') || event.target.closest('.card') || event.target.closest('.card-btn')) return;
 
     ripplesArray.push({
@@ -83,7 +78,6 @@ window.addEventListener('click', (event) => {
     });
 });
 
-// --- PARTICLE CLASS MODULE ---
 class Particle {
     constructor(x, y) {
         this.x = x; this.y = y;
@@ -161,15 +155,13 @@ class Particle {
     }
 }
 
-// --- DYNAMIC MODE TOGGLE CONTROLLER ---
 const modeToggleBtn = document.getElementById('mode-toggle');
-let isToggling = false; // ✨ NEW: State latch flag to stop button spamming!
+let isToggling = false; 
 
 modeToggleBtn.addEventListener('click', (e) => {
-    // 🛑 If a wave is currently running across the screen, ignore any incoming clicks!
     if (isToggling) return; 
     
-    isToggling = true; // 🔒 Lock the button down immediately
+    isToggling = true; 
 
     const oldMode = currentMode;
     currentMode = currentMode === 'dark' ? 'light' : 'dark';
@@ -191,17 +183,15 @@ modeToggleBtn.addEventListener('click', (e) => {
         oldMode: oldMode
     });
 
-    // 🔓 Unlock the button exactly when the 0.35s CSS transitions and canvas flash conclude safely!
     setTimeout(() => {
         isToggling = false;
-    }, 800); // 800ms aligns beautifully with your high-speed expansion wave
+    }, 800); 
 });
 
-// --- AUTOMATED INTERSECTION OBSERVER ENGINE ---
 const scrollSections = document.querySelectorAll('.scroll-page');
 const observerOptions = {
-    root: null, // Scans native window view scope
-    threshold: 0.6 // Trigger when section occupies 60% of viewport
+    root: null,
+    threshold: 0.6
 };
 
 const sectionObserver = new IntersectionObserver((entries) => {
@@ -209,13 +199,9 @@ const sectionObserver = new IntersectionObserver((entries) => {
         if (entry.isIntersecting) {
             const targetedTheme = entry.target.getAttribute('data-scroll-theme');
             
-            // ✨ Only switch themes when crossing section thresholds, with NO center ripple!
             if (targetedTheme !== currentTheme) {
                 currentTheme = targetedTheme;
                 document.body.setAttribute('data-theme', currentTheme);
-                
-                // Note: The ripplesArray push has been completely removed from here
-                // to ensure a velvety smooth color transition on scroll!
             }
         }
     });
@@ -225,7 +211,6 @@ scrollSections.forEach(section => sectionObserver.observe(section));
 
 init();
 
-// --- RENDERING LOOP ROUTINE ---
 function animate() {
     const activeModeWave = ripplesArray.find(r => r.isModeWave);
 
@@ -261,14 +246,12 @@ function animate() {
     requestAnimationFrame(animate);
 }
 
-// ✨ FIX: Intercept card redirect buttons and force an explicit smooth scroll to targets!
 document.querySelectorAll('.card-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
         const targetId = btn.getAttribute('href');
         
-        // Only override if it's an internal hash anchor link
         if (targetId && targetId.startsWith('#')) {
-            e.preventDefault(); // Stop raw jumping quirks
+            e.preventDefault();
             const targetSection = document.querySelector(targetId);
             
             if (targetSection) {
@@ -279,6 +262,30 @@ document.querySelectorAll('.card-btn').forEach(btn => {
             }
         }
     });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const jumpGalleryBtn = document.querySelector('.jump-gallery-btn');
+    if (jumpGalleryBtn) {
+        jumpGalleryBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const gallerySection = document.querySelector('#gallery-target');
+            if (gallerySection) {
+                gallerySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    }
+
+    const topScrollBtn = document.querySelector('.back-to-top-btn');
+    if (topScrollBtn) {
+        topScrollBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const introSection = document.querySelector('main.content-container > section:first-of-type');
+            if (introSection) {
+                introSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    }
 });
 
 animate();
